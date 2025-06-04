@@ -44,9 +44,18 @@ app.post('/calcular-total', async (req, res) => {
     const datos = doc.data();
     const precio = datos.Precio;
     const nombre = datos.Nombre;
-    const total = precio * cantidad;
+    const subtotal = precio * cantidad;
+    const iva = +(subtotal * 0.16).toFixed(2);
+    const total = +(subtotal + iva).toFixed(2);
 
-    res.json({ nombre, precio, cantidad, total });
+    res.json({
+      nombre,
+      precio,
+      cantidad,
+      subtotal,
+      iva,
+      total
+    });
   } catch (error) {
     console.error('Error consultando Firestore:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
