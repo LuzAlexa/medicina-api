@@ -3,13 +3,13 @@ const cors = require('cors');
 const admin = require('firebase-admin');
 const fs = require('fs');
 
-// Leer el archivo de credenciales desde el Secret File en Render
+// Leer archivo secreto en Render
 const serviceAccount = JSON.parse(
-  fs.readFileSync('/etc/secrets/GOOGLE_APPLICATION_CREDENTIALS', 'utf8')
+  fs.readFileSync('/etc/secrets/GOOGLE_APPLICATION_CREDENTIALS.json', 'utf8')
 );
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
@@ -18,13 +18,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Obtener lista de medicamentos
 app.get('/medicamentos', async (req, res) => {
   try {
     const snapshot = await db.collection('medicamentos').get();
     const medicamentos = snapshot.docs.map(doc => ({
       id: doc.id,
-      nombre: doc.data().Nombre
+      nombre: doc.data().Nombre,
     }));
     res.json(medicamentos);
   } catch (error) {
@@ -33,7 +32,6 @@ app.get('/medicamentos', async (req, res) => {
   }
 });
 
-// Calcular el total por medicamento seleccionado
 app.post('/calcular-total', async (req, res) => {
   try {
     const { id, cantidad } = req.body;
@@ -48,19 +46,13 @@ app.post('/calcular-total', async (req, res) => {
     const nombre = datos.Nombre;
     const total = precio * cantidad;
 
-    res.json({
-      nombre,
-      precio,
-      cantidad,
-      total
-    });
+    res.json({ nombre, precio, cantidad, total });
   } catch (error) {
     console.error('Error consultando Firestore:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
-// Puerto
 const PORT = process.env.PORT || 3100;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
