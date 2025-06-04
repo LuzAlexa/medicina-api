@@ -1,10 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
+const fs = require('fs');
 
-// Leer las credenciales desde variable de entorno
-const serviceAccountJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
-const serviceAccount = JSON.parse(serviceAccountJson);
+// Leer el archivo de credenciales desde el Secret File en Render
+const serviceAccount = JSON.parse(
+  fs.readFileSync('/etc/secrets/GOOGLE_APPLICATION_CREDENTIALS', 'utf8')
+);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
