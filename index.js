@@ -3,11 +3,7 @@ const cors = require('cors');
 const admin = require('firebase-admin');
 
 // Leer las credenciales desde variable de entorno
-const serviceAccount = require('/etc/secrets/credenciales.json');
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
+const serviceAccountJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
 const serviceAccount = JSON.parse(serviceAccountJson);
 
 admin.initializeApp({
@@ -20,6 +16,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Obtener lista de medicamentos
 app.get('/medicamentos', async (req, res) => {
   try {
     const snapshot = await db.collection('medicamentos').get();
@@ -34,6 +31,7 @@ app.get('/medicamentos', async (req, res) => {
   }
 });
 
+// Calcular el total por medicamento seleccionado
 app.post('/calcular-total', async (req, res) => {
   try {
     const { id, cantidad } = req.body;
@@ -46,8 +44,8 @@ app.post('/calcular-total', async (req, res) => {
     const datos = doc.data();
     const precio = datos.Precio;
     const nombre = datos.Nombre;
-
     const total = precio * cantidad;
+
     res.json({
       nombre,
       precio,
@@ -60,6 +58,7 @@ app.post('/calcular-total', async (req, res) => {
   }
 });
 
+// Puerto
 const PORT = process.env.PORT || 3100;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
