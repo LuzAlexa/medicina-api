@@ -3,11 +3,10 @@ const cors = require('cors');
 const admin = require('firebase-admin');
 
 // Leer las credenciales desde variable de entorno
-const serviceAccountJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
-
-if (!serviceAccountJson) {
-  throw new Error('Falta la variable GOOGLE_APPLICATION_CREDENTIALS_JSON');
-}
+const serviceAccount = require('/etc/secrets/credenciales.json');
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 const serviceAccount = JSON.parse(serviceAccountJson);
 
