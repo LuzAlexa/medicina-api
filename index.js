@@ -24,6 +24,7 @@ app.get('/medicamentos', async (req, res) => {
     const medicamentos = snapshot.docs.map(doc => ({
       id: doc.id,
       nombre: doc.data().Nombre,
+      precio: doc.data().Precio,
     }));
     res.json(medicamentos);
   } catch (error) {
